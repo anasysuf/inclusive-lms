@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { SessionWrapper } from '@/components/providers/SessionWrapper';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
@@ -10,9 +10,35 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'AccessiLearn | Platform Pembelajaran Inklusif & Aksesibel (Sistem Tertutup)',
+  title: {
+    default: 'AccessiLearn | Platform Pembelajaran Inklusif & Aksesibel',
+    template: '%s | AccessiLearn',
+  },
   description:
     'Platform e-learning sistem tertutup ramah disabilitas dan sesuai standar WCAG 2.1 Level AA yang dirancang berlandaskan keilmuan Pendidikan Luar Biasa (PLB) dan Universal Design for Learning (UDL).',
+  keywords: [
+    'AccessiLearn',
+    'E-Learning Inklusif',
+    'Pendidikan Luar Biasa',
+    'WCAG 2.1 AA',
+    'Universal Design for Learning',
+    'Disleksia',
+    'ADHD',
+    'Aksesibilitas Web',
+  ],
+  authors: [{ name: 'AccessiLearn Special Education Team' }],
+  creator: 'AccessiLearn',
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#7c3aed',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5, // Izinkan zoom hingga 500% demi aksesibilitas WCAG 1.4.4
 };
 
 export default function RootLayout({
