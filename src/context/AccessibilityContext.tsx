@@ -192,25 +192,41 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     const html = document.documentElement;
     const body = document.body;
 
-    // Terapkan kelas tema
-    html.classList.remove('theme-high-contrast-dark', 'theme-yellow-on-black', 'theme-soft-tint');
+    // Terapkan kelas tema & atribut data-theme
+    const allThemes = ['theme-high-contrast-dark', 'theme-yellow-on-black', 'theme-soft-tint', 'theme-default'];
+    html.classList.remove(...allThemes, 'dark');
+    body.classList.remove(...allThemes, 'dark');
+
+    html.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+
     if (theme !== 'default') {
       html.classList.add(`theme-${theme}`);
+      body.classList.add(`theme-${theme}`);
+      if (theme === 'high-contrast-dark' || theme === 'yellow-on-black') {
+        html.classList.add('dark');
+        body.classList.add('dark');
+      }
     }
 
     // Terapkan kelas huruf
     body.classList.remove('font-dyslexic', 'font-atkinson');
+    html.classList.remove('font-dyslexic', 'font-atkinson');
     if (font === 'dyslexic') {
       body.classList.add('font-dyslexic');
+      html.classList.add('font-dyslexic');
     } else if (font === 'atkinson') {
       body.classList.add('font-atkinson');
+      html.classList.add('font-atkinson');
     }
 
     // Terapkan kelas gerak
     if (reduceMotion) {
       html.classList.add('reduce-motion');
+      body.classList.add('reduce-motion');
     } else {
       html.classList.remove('reduce-motion');
+      body.classList.remove('reduce-motion');
     }
 
     // Terapkan variabel CSS

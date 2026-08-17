@@ -8,7 +8,9 @@
 
 @layer base {
   /* Default Clean Modern Palette: Minimum 4.5:1 text contrast */
-  :root {
+  :root,
+  html,
+  body {
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -33,69 +35,85 @@
     --line-height-scale: 1.6;
     --letter-spacing-scale: 0.01em;
   }
+}
 
-  /* High Contrast Dark Mode: Pure Black + Stark White (>15:1 contrast) */
-  .theme-high-contrast-dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 100%;
-    --primary: 48 96% 53%; /* Bright Yellow */
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 18%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 18%;
-    --muted-foreground: 0 0% 88%;
-    --accent: 48 96% 53%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 100% 60%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 0 0% 40%;
-    --input: 0 0% 30%;
-    --ring: 48 96% 53%;
-  }
+/* =========================================================================
+   CONTRAST THEMES (DIRECT OVERRIDES WITH HIGH SPECIFICITY)
+   ========================================================================= */
 
-  /* Yellow on Black Theme: Specialized for Low Vision / Visual Impairments */
-  .theme-yellow-on-black {
-    --background: 0 0% 0%;
-    --foreground: 60 100% 50%; /* Vibrant Pure Yellow */
-    --card: 0 0% 5%;
-    --card-foreground: 60 100% 50%;
-    --primary: 60 100% 50%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 60 100% 50%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 60 100% 70%;
-    --accent: 60 100% 50%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 15 100% 50%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 60 100% 50%;
-    --input: 60 100% 50%;
-    --ring: 60 100% 50%;
-  }
+/* 1. High Contrast Dark Mode: Pure Black + Stark White (>15:1 contrast) */
+:root[data-theme="high-contrast-dark"],
+html.theme-high-contrast-dark,
+body.theme-high-contrast-dark,
+.theme-high-contrast-dark {
+  --background: 0 0% 0% !important;
+  --foreground: 0 0% 100% !important;
+  --card: 0 0% 7% !important;
+  --card-foreground: 0 0% 100% !important;
+  --primary: 48 96% 53% !important; /* Bright Yellow */
+  --primary-foreground: 0 0% 0% !important;
+  --secondary: 0 0% 16% !important;
+  --secondary-foreground: 0 0% 100% !important;
+  --muted: 0 0% 16% !important;
+  --muted-foreground: 0 0% 85% !important;
+  --accent: 48 96% 53% !important;
+  --accent-foreground: 0 0% 0% !important;
+  --destructive: 0 100% 60% !important;
+  --destructive-foreground: 0 0% 0% !important;
+  --border: 0 0% 35% !important;
+  --input: 0 0% 25% !important;
+  --ring: 48 96% 53% !important;
+  color-scheme: dark;
+}
 
-  /* Soft Tint / Cream Theme: For Scotopic Sensitivity / Visual Stress / Dyslexia glare reduction */
-  .theme-soft-tint {
-    --background: 44 48% 94%; /* Warm cream #FAF5E9 */
-    --foreground: 220 30% 15%; /* Deep slate #1B2433 */
-    --card: 44 45% 98%;
-    --card-foreground: 220 30% 15%;
-    --primary: 199 89% 34%; /* Deep marine teal */
-    --primary-foreground: 44 48% 96%;
-    --secondary: 44 30% 88%;
-    --secondary-foreground: 220 30% 15%;
-    --muted: 44 30% 88%;
-    --muted-foreground: 220 20% 35%;
-    --accent: 44 40% 85%;
-    --accent-foreground: 220 30% 15%;
-    --destructive: 0 75% 45%;
-    --destructive-foreground: 44 48% 96%;
-    --border: 44 25% 80%;
-    --input: 44 25% 80%;
-    --ring: 199 89% 34%;
-  }
+/* 2. Yellow on Black Theme: Specialized for Low Vision / Visual Impairments */
+:root[data-theme="yellow-on-black"],
+html.theme-yellow-on-black,
+body.theme-yellow-on-black,
+.theme-yellow-on-black {
+  --background: 0 0% 0% !important;
+  --foreground: 60 100% 50% !important; /* Vibrant Pure Yellow */
+  --card: 0 0% 4% !important;
+  --card-foreground: 60 100% 50% !important;
+  --primary: 60 100% 50% !important;
+  --primary-foreground: 0 0% 0% !important;
+  --secondary: 0 0% 12% !important;
+  --secondary-foreground: 60 100% 50% !important;
+  --muted: 0 0% 12% !important;
+  --muted-foreground: 60 100% 75% !important;
+  --accent: 60 100% 50% !important;
+  --accent-foreground: 0 0% 0% !important;
+  --destructive: 15 100% 50% !important;
+  --destructive-foreground: 0 0% 0% !important;
+  --border: 60 100% 50% !important;
+  --input: 60 100% 50% !important;
+  --ring: 60 100% 50% !important;
+  color-scheme: dark;
+}
+
+/* 3. Soft Tint / Cream Theme: For Scotopic Sensitivity / Visual Stress / Dyslexia glare reduction */
+:root[data-theme="soft-tint"],
+html.theme-soft-tint,
+body.theme-soft-tint,
+.theme-soft-tint {
+  --background: 44 48% 94% !important; /* Warm cream #FAF5E9 */
+  --foreground: 220 30% 15% !important; /* Deep slate #1B2433 */
+  --card: 44 45% 98% !important;
+  --card-foreground: 220 30% 15% !important;
+  --primary: 199 89% 34% !important; /* Deep marine teal */
+  --primary-foreground: 44 48% 96% !important;
+  --secondary: 44 30% 88% !important;
+  --secondary-foreground: 220 30% 15% !important;
+  --muted: 44 30% 88% !important;
+  --muted-foreground: 220 20% 35% !important;
+  --accent: 44 40% 85% !important;
+  --accent-foreground: 220 30% 15% !important;
+  --destructive: 0 75% 45% !important;
+  --destructive-foreground: 44 48% 96% !important;
+  --border: 44 25% 78% !important;
+  --input: 44 25% 78% !important;
+  --ring: 199 89% 34% !important;
+  color-scheme: light;
 }
 
 /* =========================================================================
@@ -105,7 +123,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Inter:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap');
 
 /* Dyslexia mode styles */
-body.font-dyslexic {
+body.font-dyslexic,
+html.font-dyslexic {
   font-family: 'Lexend', 'Comic Neue', 'Arial Rounded MT Bold', sans-serif !important;
   letter-spacing: 0.05em !important;
   word-spacing: 0.1em !important;
@@ -113,11 +132,14 @@ body.font-dyslexic {
 
 body.font-dyslexic p,
 body.font-dyslexic li,
-body.font-dyslexic article {
+body.font-dyslexic article,
+html.font-dyslexic p,
+html.font-dyslexic li {
   line-height: 1.9 !important;
 }
 
-body.font-atkinson {
+body.font-atkinson,
+html.font-atkinson {
   font-family: 'Lexend', 'Segoe UI', system-ui, sans-serif !important;
   letter-spacing: 0.02em !important;
 }
@@ -130,8 +152,8 @@ html {
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
   line-height: var(--line-height-scale, 1.6);
   letter-spacing: var(--letter-spacing-scale, 0.01em);
   transition: background-color 0.2s ease, color 0.2s ease;
