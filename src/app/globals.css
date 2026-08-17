@@ -125,6 +125,8 @@ body.font-atkinson {
 /* Dynamic text scaling applied across the entire UI smoothly */
 html {
   font-size: calc(16px * var(--content-scale, 1));
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -134,6 +136,13 @@ body {
   letter-spacing: var(--letter-spacing-scale, 0.01em);
   transition: background-color 0.2s ease, color 0.2s ease;
   min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure containers and badges wrap cleanly when zoomed in */
+article, section, header, nav, footer, main, form {
+  min-width: 0;
 }
 
 /* =========================================================================

@@ -159,7 +159,7 @@ export function Navbar() {
                     <span className="text-[11px] text-muted-foreground block font-mono truncate">
                       {user?.email}
                     </span>
-                    <Badge variant={isAdmin ? 'destructive' : isInstructor ? 'default' : 'secondary'} className="text-[10px] mt-1">
+                    <Badge variant={isAdmin ? 'destructive' : isInstructor ? 'default' : 'secondary'} className="text-xs mt-1">
                       {isAdmin ? 'Role: Administrator' : isInstructor ? 'Role: Instruktur PLB' : 'Role: Peserta Didik'}
                     </Badge>
                   </div>

@@ -442,29 +442,29 @@ export function AccessibleQuizRunner({
       <div
         role="region"
         aria-label="Status Kuis dan Waktu Tersisa"
-        className="sticky top-20 z-20 rounded-2xl border-2 border-border bg-card/95 backdrop-blur p-4 shadow-md flex items-center justify-between gap-4"
+        className="sticky top-20 z-20 rounded-2xl border-2 border-border bg-card/95 backdrop-blur p-3.5 sm:p-4 shadow-md flex flex-wrap items-center justify-between gap-3"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono font-bold bg-primary/10 text-primary px-2.5 py-1 rounded-lg">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="default" className="text-xs font-mono font-bold">
             Soal {currentQuestionIdx + 1} dari {questions.length}
-          </span>
+          </Badge>
           {requiresExtendedTime && (
-            <Badge variant="warning" className="hidden sm:inline-flex">
-              Waktu Tambahan
+            <Badge variant="warning" className="text-xs font-semibold">
+              Waktu Tambahan {extendedTimeMultiplier}x
             </Badge>
           )}
         </div>
 
         {/* Indikator Waktu Rendah Tekanan */}
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 font-mono font-bold text-sm ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 font-mono font-bold text-xs sm:text-sm ${
             timeRemaining < 60
               ? 'border-destructive bg-destructive/10 text-destructive animate-pulse'
               : 'border-primary/40 bg-primary/5 text-primary'
           }`}
           aria-live="off"
         >
-          <Clock className="w-4 h-4" aria-hidden="true" />
+          <Clock className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>{formatTime(timeRemaining)}</span>
           <span className="sr-only">tersisa dalam kuis</span>
         </div>

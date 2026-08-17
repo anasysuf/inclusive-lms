@@ -135,10 +135,10 @@ export default async function InstructorDashboardPage() {
                     <Badge variant="secondary" className="text-xs">
                       {course.difficulty}
                     </Badge>
-                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                    <Badge variant="success" className="text-xs font-semibold gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
-                      Alt-Text Terverifikasi
-                    </span>
+                      <span>Alt-Text Terverifikasi</span>
+                    </Badge>
                   </div>
 
                   <h3 className="text-lg font-bold text-foreground line-clamp-1">

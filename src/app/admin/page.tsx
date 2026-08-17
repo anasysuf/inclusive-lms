@@ -274,7 +274,7 @@ export default function AdminDashboardPage() {
 
       {/* Kartu Ringkasan Metrik Sistem */}
       {stats && (
-        <section aria-labelledby="admin-metrics-heading" className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <section aria-labelledby="admin-metrics-heading" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="p-5 rounded-2xl border-2 border-border bg-card shadow-sm space-y-1">
             <div className="flex items-center justify-between text-muted-foreground">
               <span className="text-xs font-bold uppercase tracking-wider">Pengguna Aktif</span>
@@ -460,10 +460,10 @@ export default function AdminDashboardPage() {
 
                       <td className="py-4 px-4">
                         {u.requiresExtendedTime ? (
-                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/30">
+                          <Badge variant="warning" className="gap-1 text-xs">
                             <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
-                            <span>Waktu {u.timeMultiplier}x Ekstra</span>
-                          </span>
+                            <span>Waktu {u.timeMultiplier}x</span>
+                          </Badge>
                         ) : (
                           <span className="text-xs text-muted-foreground">Standar (1.0x)</span>
                         )}
