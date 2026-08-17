@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String           @id @default(cuid())
+  name                 String
+  email                String           @unique
+  password             String           @default("$2a$10$wN1GjYqD7Gk4Mh.E7qF3e.Hq1fFvh75R4XvU6Fv8p6H3t7Z.vK2m2") // Default hashed "password123"
+  role                 String           @default("STUDENT") // "INSTRUCTOR" | "STUDENT" | "ADMIN"
+  status               String           @default("APPROVED") // "APPROVED" | "PENDING" | "REJECTED"
+  registrationNote     String?          // Alasan pendaftaran / kebutuhan akomodasi khusus
+  requiresExtendedTime Boolean          @default(false)
+  timeMultiplier       Float            @default(1.5)
+  preferredTheme       String           @default("default") // "default" | "high-contrast-dark" | "yellow-on-black" | "soft-tint"
+  preferredFont        String           @default("system")  // "system" | "dyslexic" | "atkinson"
+  fontSizeMultiplier   Float            @default(1.0)
+  enableReadingRuler   Boolean          @default(false)
+  coursesTaught        Course[]         @relation("InstructorCourses")
+  quizSubmissions      QuizSubmission[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model Course {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  difficulty    String    @default("All Levels")
+  coverImageUrl String?
+  coverImageAlt String
+  instructorId  String
+  instructor    User      @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+  lessons       Lesson[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([instructorId])
+}
+
+model Lesson {
+  id            String    @id @default(cuid())
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order         Int       @default(1)
+  title         String
+  summary       String?
+  content       String    // Rich accessible HTML content with clear landmarks & typography
+  videoUrl      String?
+  captionsUrl   String?   // WebVTT caption file URL
+  audioUrl      String?   // Audio description or narration URL
+  hasTranscript Boolean   @default(true)
+  transcript    String?   // Full verbatim accessible transcript
+  quizzes       Quiz[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([courseId])
+}
+
+model Quiz {
+  id            String           @id @default(cuid())
+  lessonId      String
+  lesson        Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  baseTimeLimit Int              @default(300) // in seconds (e.g. 300s = 5 mins)
+  questions     String           // JSON string: array of { id, question, options: string[], correctIndex: number, explanation: string, altText?: string }
+  submissions   QuizSubmission[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([lessonId])
+}
+
+model QuizSubmission {
+  id               String   @id @default(cuid())
+  quizId           String
+  quiz             Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score            Int
+  totalQuestions   Int
+  timeSpent        Int      // in seconds
+  extendedTimeUsed Boolean  @default(false)
+  answersJson      String   // JSON string of user answer index map
+  createdAt        DateTime @default(now())
+
+  @@index([quizId])
+  @@index([userId])
+}

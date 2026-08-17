@@ -1,0 +1,13 @@
+WEBVTT - HTML Semantik & Wilayah Landmark Aksesibel
+
+00:00.000 --> 00:12.000
+Dalam pelajaran ini, kita membahas pentingnya wilayah landmark HTML semantik dalam aksesibilitas web.
+
+00:12.500 --> 00:30.000
+Ketika pengguna pembaca layar mengakses halaman web, mereka sering menekan tombol 'H' untuk memindai judul atau tombol 'D' untuk melompat antar-wilayah landmark.
+
+00:30.500 --> 00:55.000
+Struktur situs yang buruk dengan hanya menggunakan elemen div generik memaksa pengguna teknologi asistif mendengarkan seluruh halaman dari awal.
+
+00:55.500 --> 01:20.000
+Selalu tentukan satu judul tingkat h1 per halaman dan susun subjudul h2 serta h3 secara hierarkis dan logis.

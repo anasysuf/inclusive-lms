@@ -2,32 +2,228 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/* =========================================================================
+   ACCESSIBILITY FIRST CSS & THEME TOKENS (WCAG 2.1 AA / AAA COMPLIANT)
+   ========================================================================= */
+
+@layer base {
+  /* Default Clean Modern Palette: Minimum 4.5:1 text contrast */
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 40%;
+    --accent: 210 40% 92%;
+    --accent-foreground: 222 47% 11.2%;
+    --destructive: 0 84.2% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 88%;
+    --input: 214.3 31.8% 88%;
+    --ring: 221 83% 53%;
+    --radius: 0.75rem;
+
+    /* Accessibility state variables */
+    --content-scale: 1;
+    --line-height-scale: 1.6;
+    --letter-spacing-scale: 0.01em;
+  }
+
+  /* High Contrast Dark Mode: Pure Black + Stark White (>15:1 contrast) */
+  .theme-high-contrast-dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+    --primary: 48 96% 53%; /* Bright Yellow */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 88%;
+    --accent: 48 96% 53%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 0 0% 0%;
+    --border: 0 0% 40%;
+    --input: 0 0% 30%;
+    --ring: 48 96% 53%;
+  }
+
+  /* Yellow on Black Theme: Specialized for Low Vision / Visual Impairments */
+  .theme-yellow-on-black {
+    --background: 0 0% 0%;
+    --foreground: 60 100% 50%; /* Vibrant Pure Yellow */
+    --card: 0 0% 5%;
+    --card-foreground: 60 100% 50%;
+    --primary: 60 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 60 100% 50%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 60 100% 70%;
+    --accent: 60 100% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 15 100% 50%;
+    --destructive-foreground: 0 0% 0%;
+    --border: 60 100% 50%;
+    --input: 60 100% 50%;
+    --ring: 60 100% 50%;
+  }
+
+  /* Soft Tint / Cream Theme: For Scotopic Sensitivity / Visual Stress / Dyslexia glare reduction */
+  .theme-soft-tint {
+    --background: 44 48% 94%; /* Warm cream #FAF5E9 */
+    --foreground: 220 30% 15%; /* Deep slate #1B2433 */
+    --card: 44 45% 98%;
+    --card-foreground: 220 30% 15%;
+    --primary: 199 89% 34%; /* Deep marine teal */
+    --primary-foreground: 44 48% 96%;
+    --secondary: 44 30% 88%;
+    --secondary-foreground: 220 30% 15%;
+    --muted: 44 30% 88%;
+    --muted-foreground: 220 20% 35%;
+    --accent: 44 40% 85%;
+    --accent-foreground: 220 30% 15%;
+    --destructive: 0 75% 45%;
+    --destructive-foreground: 44 48% 96%;
+    --border: 44 25% 80%;
+    --input: 44 25% 80%;
+    --ring: 199 89% 34%;
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+/* =========================================================================
+   DYSLEXIA & SPECIAL EDUCATION TYPOGRAPHY
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Inter:wght@400;500;600;700;800&family=Lexend:wght@400;500;600;700&display=swap');
+
+/* Dyslexia mode styles */
+body.font-dyslexic {
+  font-family: 'Lexend', 'Comic Neue', 'Arial Rounded MT Bold', sans-serif !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+}
+
+body.font-dyslexic p,
+body.font-dyslexic li,
+body.font-dyslexic article {
+  line-height: 1.9 !important;
+}
+
+body.font-atkinson {
+  font-family: 'Lexend', 'Segoe UI', system-ui, sans-serif !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Dynamic text scaling applied across the entire UI smoothly */
+html {
+  font-size: calc(16px * var(--content-scale, 1));
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  line-height: var(--line-height-scale, 1.6);
+  letter-spacing: var(--letter-spacing-scale, 0.01em);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  min-height: 100vh;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* =========================================================================
+   KEYBOARD FOCUS MANAGEMENT (WCAG 2.4.7 Focus Visible)
+   ========================================================================= */
+
+/* Unmistakable, high-contrast keyboard focus indicators */
+*:focus-visible {
+  outline: 3px solid hsl(var(--ring)) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px hsl(var(--background)) !important;
+}
+
+/* Ensure focus is not lost inside dark or yellow themes */
+.theme-high-contrast-dark *:focus-visible,
+.theme-yellow-on-black *:focus-visible {
+  outline: 3px solid #FFFF00 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #000000 !important;
+}
+
+/* =========================================================================
+   REDUCED MOTION (WCAG 2.3.3 Animation from Interactions)
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* =========================================================================
+   READING RULER OVERLAY
+   ========================================================================= */
+
+.reading-ruler-guide {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: rgba(254, 240, 138, 0.25);
+  border-top: 2px solid rgba(234, 179, 8, 0.7);
+  border-bottom: 2px solid rgba(234, 179, 8, 0.7);
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15);
+  transition: top 0.05s ease-out;
+}
+
+.theme-high-contrast-dark .reading-ruler-guide,
+.theme-yellow-on-black .reading-ruler-guide {
+  background: rgba(255, 255, 0, 0.2);
+  border-top: 2px solid #FFFF00;
+  border-bottom: 2px solid #FFFF00;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+}
+
+/* =========================================================================
+   SKIP LINKS (WCAG 2.4.1 Bypass Blocks)
+   ========================================================================= */
+
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 1rem;
+  z-index: 100000;
+  padding: 0.75rem 1.25rem;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 700;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  transition: top 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
