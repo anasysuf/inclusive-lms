@@ -21,11 +21,36 @@ export default withAuth(
       }
     }
 
+    // 3. Proteksi Endpoint API Admin
+    if (pathname.startsWith('/api/admin')) {
+      if (userRole !== 'ADMIN') {
+        return NextResponse.json(
+          { error: 'Akses Ditolak: Memerlukan hak akses Administrator.' },
+          { status: 403 }
+        );
+      }
+    }
+
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        const pathname = req.nextUrl.pathname;
+        
+        // Rute publik tidak memerlukan token
+        if (
+          pathname === '/login' ||
+          pathname === '/register' ||
+          pathname === '/' ||
+          pathname === '/unauthorized' ||
+          pathname.startsWith('/api/auth')
+        ) {
+          return true;
+        }
+
+        return !!token;
+      },
     },
     pages: {
       signIn: '/login',
@@ -33,7 +58,7 @@ export default withAuth(
   }
 );
 
-// Terapkan proteksi sistem tertutup pada semua halaman kursus, admin, dan studio pengajar
+// Terapkan proteksi sistem tertutup pada semua halaman dan API internal
 export const config = {
   matcher: [
     '/courses/:path*',
@@ -44,5 +69,10 @@ export const config = {
     '/admin',
     '/profile/:path*',
     '/profile',
+    '/api/admin/:path*',
+    '/api/courses/:path*',
+    '/api/lessons/:path*',
+    '/api/quizzes/:path*',
+    '/api/users/:path*',
   ],
 };

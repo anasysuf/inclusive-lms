@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { sanitizeHtml } from '@/lib/sanitize';
 import {
   ChevronLeft,
   ChevronRight,
@@ -144,10 +145,10 @@ export default async function LessonPlayerPage({
               <TextToSpeechButton text={lesson.content} label="Bacakan Catatan" size="sm" />
             </div>
 
-            {/* Render teks instruksional */}
+            {/* Render teks instruksional (tersanitasi) */}
             <div
               className="prose prose-slate dark:prose-invert max-w-none text-foreground/90 leading-relaxed space-y-4 [&>h2]:text-2xl [&>h2]:font-extrabold [&>h2]:text-foreground [&>h2]:mt-6 [&>h3]:text-lg [&>h3]:font-bold [&>h3]:text-foreground [&>h3]:mt-4 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:space-y-2 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:space-y-2 [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-muted-foreground [&>pre]:bg-muted [&>pre]:p-4 [&>pre]:rounded-xl [&>pre]:overflow-x-auto"
-              dangerouslySetInnerHTML={{ __html: lesson.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(lesson.content) }}
             />
           </article>
 

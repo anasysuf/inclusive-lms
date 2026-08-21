@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 // GET /api/admin/users - Ambil semua pengguna beserta metriknya (Hanya untuk ADMIN)
 export async function GET() {
@@ -81,16 +82,28 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, password, role, requiresExtendedTime, timeMultiplier } = body;
 
-    if (!name || name.trim().length < 2) {
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
       return NextResponse.json({ error: 'Nama pengguna harus minimal 2 karakter.' }, { status: 400 });
     }
 
-    if (!email || !email.includes('@')) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== 'string' || !emailRegex.test(email.trim())) {
       return NextResponse.json({ error: 'Alamat email tidak valid.' }, { status: 400 });
     }
 
-    if (!password || password.length < 6) {
-      return NextResponse.json({ error: 'Kata sandi harus minimal 6 karakter.' }, { status: 400 });
+    if (!password || typeof password !== 'string' || password.length < 8) {
+      return NextResponse.json({ error: 'Kata sandi harus minimal 8 karakter untuk keamanan.' }, { status: 400 });
+    }
+
+    const validRoles = ['ADMIN', 'INSTRUCTOR', 'STUDENT'];
+    const safeRole = role && validRoles.includes(role) ? role : 'STUDENT';
+
+    let safeMultiplier = 1.5;
+    if (timeMultiplier !== undefined) {
+      const parsed = Number(timeMultiplier);
+      if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 3.0) {
+        safeMultiplier = parsed;
+      }
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -105,13 +118,13 @@ export async function POST(request: Request) {
 
     const newUser = await prisma.user.create({
       data: {
-        name: name.trim(),
+        name: sanitizePlainText(name),
         email: email.toLowerCase().trim(),
         password: hashedPassword,
-        role: role || 'STUDENT',
+        role: safeRole,
         status: 'APPROVED',
         requiresExtendedTime: Boolean(requiresExtendedTime),
-        timeMultiplier: timeMultiplier ? Number(timeMultiplier) : 1.5,
+        timeMultiplier: safeMultiplier,
       },
       select: {
         id: true,

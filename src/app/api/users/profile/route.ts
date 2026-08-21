@@ -115,15 +115,54 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Pengguna tidak ditemukan' }, { status: 404 });
     }
 
+    const dataToUpdate: any = {};
+
+    if (requiresExtendedTime !== undefined) {
+      dataToUpdate.requiresExtendedTime = Boolean(requiresExtendedTime);
+    }
+
+    if (timeMultiplier !== undefined) {
+      const parsed = Number(timeMultiplier);
+      if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 3.0) {
+        dataToUpdate.timeMultiplier = parsed;
+      }
+    }
+
+    const allowedThemes = ['default', 'high-contrast-dark', 'yellow-on-black', 'soft-tint'];
+    if (preferredTheme && allowedThemes.includes(preferredTheme)) {
+      dataToUpdate.preferredTheme = preferredTheme;
+    }
+
+    const allowedFonts = ['system', 'dyslexic', 'atkinson'];
+    if (preferredFont && allowedFonts.includes(preferredFont)) {
+      dataToUpdate.preferredFont = preferredFont;
+    }
+
+    if (fontSizeMultiplier !== undefined) {
+      const parsed = Number(fontSizeMultiplier);
+      if (!isNaN(parsed) && parsed >= 0.8 && parsed <= 2.0) {
+        dataToUpdate.fontSizeMultiplier = parsed;
+      }
+    }
+
+    if (enableReadingRuler !== undefined) {
+      dataToUpdate.enableReadingRuler = Boolean(enableReadingRuler);
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: {
-        ...(requiresExtendedTime !== undefined ? { requiresExtendedTime } : {}),
-        ...(timeMultiplier !== undefined ? { timeMultiplier: Number(timeMultiplier) } : {}),
-        ...(preferredTheme ? { preferredTheme } : {}),
-        ...(preferredFont ? { preferredFont } : {}),
-        ...(fontSizeMultiplier !== undefined ? { fontSizeMultiplier: Number(fontSizeMultiplier) } : {}),
-        ...(enableReadingRuler !== undefined ? { enableReadingRuler } : {}),
+      data: dataToUpdate,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        requiresExtendedTime: true,
+        timeMultiplier: true,
+        preferredTheme: true,
+        preferredFont: true,
+        fontSizeMultiplier: true,
+        enableReadingRuler: true,
       },
     });
 

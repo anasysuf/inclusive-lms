@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 // PATCH /api/admin/users/[id] - Perbarui peran, akomodasi, atau kata sandi pengguna
 export async function PATCH(
@@ -24,11 +25,27 @@ export async function PATCH(
     const { name, role, requiresExtendedTime, timeMultiplier, password } = body;
 
     const dataToUpdate: any = {};
-    if (name) dataToUpdate.name = name.trim();
-    if (role) dataToUpdate.role = role;
-    if (requiresExtendedTime !== undefined) dataToUpdate.requiresExtendedTime = Boolean(requiresExtendedTime);
-    if (timeMultiplier !== undefined) dataToUpdate.timeMultiplier = Number(timeMultiplier);
-    if (password && password.trim().length >= 6) {
+    if (name && typeof name === 'string') dataToUpdate.name = sanitizePlainText(name);
+    
+    if (role) {
+      const validRoles = ['ADMIN', 'INSTRUCTOR', 'STUDENT'];
+      if (validRoles.includes(role)) {
+        dataToUpdate.role = role;
+      }
+    }
+
+    if (requiresExtendedTime !== undefined) {
+      dataToUpdate.requiresExtendedTime = Boolean(requiresExtendedTime);
+    }
+
+    if (timeMultiplier !== undefined) {
+      const parsed = Number(timeMultiplier);
+      if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 3.0) {
+        dataToUpdate.timeMultiplier = parsed;
+      }
+    }
+
+    if (password && typeof password === 'string' && password.trim().length >= 8) {
       dataToUpdate.password = await bcrypt.hash(password.trim(), 10);
     }
 

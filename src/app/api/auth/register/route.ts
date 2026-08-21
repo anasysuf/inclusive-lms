@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 export async function POST(request: Request) {
   try {
@@ -15,16 +16,17 @@ export async function POST(request: Request) {
       timeMultiplier,
     } = body;
 
-    if (!name || name.trim().length < 2) {
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
       return NextResponse.json({ error: 'Nama lengkap wajib diisi (minimal 2 karakter).' }, { status: 400 });
     }
 
-    if (!email || !email.includes('@')) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== 'string' || !emailRegex.test(email.trim())) {
       return NextResponse.json({ error: 'Alamat email tidak valid.' }, { status: 400 });
     }
 
-    if (!password || password.length < 6) {
-      return NextResponse.json({ error: 'Kata sandi harus minimal 6 karakter.' }, { status: 400 });
+    if (!password || typeof password !== 'string' || password.length < 8) {
+      return NextResponse.json({ error: 'Kata sandi harus minimal 8 karakter.' }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -38,18 +40,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // Role hanya boleh STUDENT atau INSTRUCTOR saat registrasi mandiri (ADMIN dilarang keras)
+    const safeRole = role === 'INSTRUCTOR' ? 'INSTRUCTOR' : 'STUDENT';
+
+    let safeMultiplier = 1.5;
+    if (timeMultiplier !== undefined) {
+      const parsed = Number(timeMultiplier);
+      if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 3.0) {
+        safeMultiplier = parsed;
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prisma.user.create({
       data: {
-        name: name.trim(),
+        name: sanitizePlainText(name),
         email: email.toLowerCase().trim(),
         password: hashedPassword,
-        role: role === 'INSTRUCTOR' ? 'INSTRUCTOR' : 'STUDENT',
+        role: safeRole,
         status: 'PENDING', // Wajib disetujui Admin pada sistem tertutup
-        registrationNote: registrationNote ? registrationNote.trim() : null,
+        registrationNote: registrationNote && typeof registrationNote === 'string' ? sanitizePlainText(registrationNote) : null,
         requiresExtendedTime: Boolean(requiresExtendedTime),
-        timeMultiplier: timeMultiplier ? Number(timeMultiplier) : 1.5,
+        timeMultiplier: safeMultiplier,
       },
       select: {
         id: true,

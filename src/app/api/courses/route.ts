@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sanitizePlainText } from '@/lib/sanitize';
 
 // GET /api/courses - Daftar semua kursus inklusif (Wajib Login pada Sistem Tertutup)
 export async function GET(request: Request) {
@@ -22,11 +23,14 @@ export async function GET(request: Request) {
     if (category && category !== 'Semua' && category !== 'All') {
       whereClause.category = category;
     }
-    if (search) {
-      whereClause.OR = [
-        { title: { contains: search } },
-        { description: { contains: search } },
-      ];
+    if (search && typeof search === 'string') {
+      const sanitizedSearch = sanitizePlainText(search);
+      if (sanitizedSearch) {
+        whereClause.OR = [
+          { title: { contains: sanitizedSearch } },
+          { description: { contains: sanitizedSearch } },
+        ];
+      }
     }
 
     const courses = await prisma.course.findMany({
@@ -77,14 +81,14 @@ export async function POST(request: Request) {
     const { title, description, category, difficulty, coverImageUrl, coverImageAlt } = body;
 
     // Validasi Aksesibilitas: Judul dan Deskripsi
-    if (!title || title.trim().length < 5) {
+    if (!title || typeof title !== 'string' || title.trim().length < 5) {
       return NextResponse.json(
         { error: 'Judul kursus harus minimal 5 karakter untuk kejelasan identifikasi kognitif.' },
         { status: 400 }
       );
     }
 
-    if (!description || description.trim().length < 20) {
+    if (!description || typeof description !== 'string' || description.trim().length < 20) {
       return NextResponse.json(
         { error: 'Deskripsi kursus harus minimal 20 karakter untuk menginformasikan tujuan pembelajaran pada pengguna pembaca layar.' },
         { status: 400 }
@@ -92,8 +96,18 @@ export async function POST(request: Request) {
     }
 
     // PENEGAKAN ALT-TEXT KETAT (WCAG 1.1.1 Konten Non-Teks)
-    if (coverImageUrl && coverImageUrl.trim()) {
-      if (!coverImageAlt || coverImageAlt.trim().length < 8) {
+    let safeCoverImageUrl: string | null = null;
+    if (coverImageUrl && typeof coverImageUrl === 'string' && coverImageUrl.trim()) {
+      const trimmedUrl = coverImageUrl.trim();
+      if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://') && !trimmedUrl.startsWith('/')) {
+        return NextResponse.json(
+          { error: 'URL gambar sampul harus berformat URL HTTP/HTTPS yang valid.' },
+          { status: 400 }
+        );
+      }
+      safeCoverImageUrl = trimmedUrl;
+
+      if (!coverImageAlt || typeof coverImageAlt !== 'string' || coverImageAlt.trim().length < 8) {
         return NextResponse.json(
           {
             error:
@@ -138,12 +152,12 @@ export async function POST(request: Request) {
 
     const course = await prisma.course.create({
       data: {
-        title: title.trim(),
-        description: description.trim(),
-        category: category || 'Pendidikan Luar Biasa & Pedagogi',
-        difficulty: difficulty || 'Semua Tingkatan',
-        coverImageUrl: coverImageUrl || null,
-        coverImageAlt: coverImageAlt ? coverImageAlt.trim() : 'Ilustrasi materi pembelajaran',
+        title: sanitizePlainText(title),
+        description: sanitizePlainText(description),
+        category: category && typeof category === 'string' ? sanitizePlainText(category) : 'Pendidikan Luar Biasa & Pedagogi',
+        difficulty: difficulty && typeof difficulty === 'string' ? sanitizePlainText(difficulty) : 'Semua Tingkatan',
+        coverImageUrl: safeCoverImageUrl,
+        coverImageAlt: coverImageAlt && typeof coverImageAlt === 'string' ? sanitizePlainText(coverImageAlt) : 'Ilustrasi materi pembelajaran',
         instructorId,
       },
     });

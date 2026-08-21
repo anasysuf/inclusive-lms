@@ -14,7 +14,7 @@ export async function POST(
 
     if (!session || userRole !== 'ADMIN') {
       return NextResponse.json(
-        { error: 'Akses Ditolak: Hanya Administrator yang berhak menyetujui pendaftaran.' },
+        { error: 'Akses Ditolak: Hanya Administrator yang berhak memproses pendaftaran.' },
         { status: 403 }
       );
     }
@@ -26,21 +26,47 @@ export async function POST(
       return NextResponse.json({ error: 'Aksi harus berupa APPROVE atau REJECT.' }, { status: 400 });
     }
 
+    // Validasi target pendaftar
+    const targetUser = await prisma.user.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json({ error: 'Pengguna pendaftar tidak ditemukan.' }, { status: 404 });
+    }
+
     if (action === 'APPROVE') {
+      const validRoles = ['STUDENT', 'INSTRUCTOR'];
+      const assignedRole = role && validRoles.includes(role) ? role : targetUser.role;
+
+      let safeMultiplier = targetUser.timeMultiplier;
+      if (timeMultiplier !== undefined) {
+        const parsed = Number(timeMultiplier);
+        if (!isNaN(parsed) && parsed >= 1.0 && parsed <= 3.0) {
+          safeMultiplier = parsed;
+        }
+      }
+
       const updatedUser = await prisma.user.update({
         where: { id: params.id },
         data: {
           status: 'APPROVED',
-          ...(role ? { role } : {}),
+          role: assignedRole,
           ...(requiresExtendedTime !== undefined ? { requiresExtendedTime: Boolean(requiresExtendedTime) } : {}),
-          ...(timeMultiplier !== undefined ? { timeMultiplier: Number(timeMultiplier) } : {}),
+          timeMultiplier: safeMultiplier,
         },
       });
 
       return NextResponse.json({
         success: true,
         message: `Pendaftaran ${updatedUser.name} berhasil disetujui!`,
-        user: updatedUser,
+        user: {
+          id: updatedUser.id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          status: updatedUser.status,
+        },
       });
     } else {
       // REJECT
@@ -52,7 +78,12 @@ export async function POST(
       return NextResponse.json({
         success: true,
         message: `Pendaftaran ${updatedUser.name} telah ditolak.`,
-        user: updatedUser,
+        user: {
+          id: updatedUser.id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          status: updatedUser.status,
+        },
       });
     }
   } catch (error) {

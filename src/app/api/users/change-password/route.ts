@@ -26,9 +26,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (typeof newPassword !== 'string' || newPassword.length < 8) {
       return NextResponse.json(
-        { error: 'Kata sandi baru harus minimal 6 karakter.' },
+        { error: 'Kata sandi baru harus minimal 8 karakter demi keamanan akun Anda.' },
         { status: 400 }
       );
     }
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Cari pengguna berdasarkan ID atau Email
+    // Cari pengguna berdasarkan ID atau Email dari sesi pengguna yang terotentikasi
     let user = null;
     if (userId) {
       user = await prisma.user.findUnique({
@@ -63,6 +63,15 @@ export async function POST(request: Request) {
     if (!isCurrentValid) {
       return NextResponse.json(
         { error: 'Kata sandi saat ini yang Anda masukkan salah.' },
+        { status: 400 }
+      );
+    }
+
+    // Cegah penggunaan kata sandi baru yang sama dengan yang lama
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return NextResponse.json(
+        { error: 'Kata sandi baru tidak boleh sama dengan kata sandi saat ini.' },
         { status: 400 }
       );
     }
